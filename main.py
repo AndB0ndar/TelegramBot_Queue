@@ -16,39 +16,94 @@ markup.add(types.KeyboardButton(msg_info))
 
 
 def generating_title():
+    """
+    A function to generate the name of the queue if it has not been entered by the user
+    Options:
+        None
+    Return value:
+        (str): generated name
+    """
     return "queue_" + str(randint(10 ** 5, 10 ** 10))
 
 
-def create_queue(name):
+def create(title):
+    """
+    Queue creation function
+    Options:
+        title (str): queue title
+    Return value:
+        None
+    """
     pass
 
 
-def connect():
+def connect(title):
+    """
+    A function connecting to queue by title
+    Options:
+        title (str): queue title
+    Return value:
+        (bool): success/failure of connecting to the queue by title
+    """
     return True
 
 
 def connect_by_key(key):
+    """
+    A function connecting to queue by key
+    Options:
+        key (str): queue key
+    Return value:
+        (bool): success/failure of connecting to the queue by key
+        (str): title queue
+    """
     return True, "ГРУППА"
 
 
 def disconnect():
+    """
+    Disconnect from queue function
+    Options:
+    Return value:
+        (bool): success/failure of disconnect from queue
+    """
     return True
 
 
-def quit():
+def quite():
+    """
+    Dequeue function
+    Options:
+    Return value:
+        (bool): success/failure of dequeuing
+    """
     return True
 
 
 def add():
+    """
+    Add to queue function
+    Options:
+    Return value:
+        (bool): success/failure of adding to the queue
+    """
     return True
 
 
 def info():
+    """
+    A function giving information about the queue
+    Options:
+        None
+    Return value:
+        (str): queue information
+    """
     return "INFO"
 
 
 @bot.message_handler(commands=['start'])
 def decorate_info(message):
+    """the decorator issuing the starting information"""
     answer = "👋 Привет! Я твой бот-очередь!\n"
     answer += "Я помогу тебе и твоим друзьям организованно выстроиться в очередь\n"
     answer += "\nВведите:\n"
@@ -61,17 +116,19 @@ def decorate_info(message):
 
 @bot.message_handler(commands=['create'])
 def decorate_create(message):
-    text = re.split(r' ', message.text, 1)
-    title = text[1] if len(text) == 2 else generating_title()
-    answer = "Ключ вашей очереди: " + str(create_queue(title))
+    """the decorator called when a command is given to create the queue"""
+    command = re.split(r' ', message.text, 1)
+    title = command[1] if len(command) == 2 else generating_title()
+    answer = "Ключ вашей очереди: " + str(create(title))
     bot.send_message(message.from_user.id, answer, reply_markup=markup)
 
 
 @bot.message_handler(commands=['connect', 'connect_by_key'])
 def decorate_connect(message):
-    text = re.split(r' ', message.text, 1)
-    if len(text) == 2:
-        fl, title = connect(), text[1] if text[0] == "/connect" else connect_by_key(text[1])
+    """decorator called when a command is given to connection the queue"""
+    command = re.split(r' ', message.text, 1)
+    if len(command) == 2:
+        fl, title = connect(command[1]), command[1] if command[0] == "/connect" else connect_by_key(command[1])
         if fl:
             answer = "Вы подключились к группе: " + title
         else:
@@ -79,13 +136,14 @@ def decorate_connect(message):
         bot.send_message(message.from_user.id, answer, reply_markup=markup)
     else:
         answer = "Вы не ввели "
-        answer += "имя" if text[0] == "/connect" else "ключ"
+        answer += "имя" if command[0] == "/connect" else "ключ"
         answer += " очереди"
         bot.send_message(message.from_user.id, answer)
 
 
 @bot.message_handler(commands=['disconnect'])
 def decorate_disconnect(message):
+    """the decorator called when a command is given to disconnect from the queue"""
     fl = disconnect()
     if fl:
         answer = "Вы отключились от очереди"
@@ -96,8 +154,9 @@ def decorate_disconnect(message):
 
 @bot.message_handler(content_types=['text'])
 def decorate_main(message):
+    """the main decorator implementing the main interface"""
     if message.text == msg_quit:
-        fl = quit()
+        fl = quite()
         if fl:
             answer = "Вы вышли из очереди"
         else:
@@ -116,5 +175,6 @@ def decorate_main(message):
     bot.send_message(message.from_user.id, answer, reply_markup=markup)
 
 
-bot.polling(none_stop=True, interval=0) #обязательная для работы бота часть
+if __name__ == "__main__":
+    bot.polling(none_stop=True, interval=0)
 # bot.infinity_polling()
