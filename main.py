@@ -14,29 +14,38 @@ markup.add(types.KeyboardButton(msg_add))
 msg_info = "Информация об очереди"
 markup.add(types.KeyboardButton(msg_info))
 
+
 def generating_title():
     return "queue_" + str(randint(10 ** 5, 10 ** 10))
+
 
 def create_queue(name):
     pass
 
-def connect(name):
-    return True, name
+
+def connect():
+    return True
+
 
 def connect_by_key(key):
     return True, "ГРУППА"
 
+
 def disconnect():
     return True
+
 
 def quit():
     return True
 
+
 def add():
     return True
 
+
 def info():
     return "INFO"
+
 
 @bot.message_handler(commands=['start'])
 def decorate_info(message):
@@ -62,7 +71,7 @@ def decorate_create(message):
 def decorate_connect(message):
     text = re.split(r' ', message.text, 1)
     if len(text) == 2:
-        fl, title = connect(text[1]) if text[0] == "/connect" else connect_by_key(text[1])
+        fl, title = connect(), text[1] if text[0] == "/connect" else connect_by_key(text[1])
         if fl:
             answer = "Вы подключились к группе: " + title
         else:
@@ -83,6 +92,7 @@ def decorate_disconnect(message):
     else:
         answer = "Что-то пошло не так, попробуйте повторить позже"
     bot.send_message(message.from_user.id, answer, reply_markup=markup)
+
 
 @bot.message_handler(content_types=['text'])
 def decorate_main(message):
