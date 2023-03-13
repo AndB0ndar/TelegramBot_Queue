@@ -219,7 +219,6 @@ def decorate_main(message):
         else:
             answer = "Что-то пошло не так, попробуйте повторить позже"
     elif len(re.split(r"^Встать в очередь ", message.text)) > 1:
-        buf = re.findall(r"id", message.text)
         title = re.split(r'^Встать в очередь ', message.text)[1]
         if re.findall(r"id", message.text):
             fl = connect_by_id(re.split(r'id', message.text)[1], message.from_user.id)
