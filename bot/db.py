@@ -6,7 +6,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship, backref
     DeclarativeBase
 from typing import List
 from sqlalchemy import or_, and_
-
+import psycopg2
 Base = declarative_base()
 
 
@@ -38,9 +38,9 @@ class QueueHandler(object):
 
     def __init__(self):
         self.meta = MetaData()
-        self.engine = create_engine('postgresql+psycopg2://postgres:postgres@localhost:5433/Queue')
+        self.engine = create_engine('postgresql+psycopg2://postgres:postgres@postgres:5432/queue')
+        # self.engine = create_engine('postgresql+psycopg2://postgres:postgres@localhost:5433/Queue')
         Base.metadata.create_all(self.engine)
-
     def create_queue(self, name):
         session = sessionmaker(bind=self.engine)()
         lst = session.query(Queue).filter(Queue.name == name).first()
@@ -94,6 +94,8 @@ class QueueHandler(object):
             session.close()
             return False
 
+    # def refresh_queue(self, q_id):
+
     def disconnect_by_id(self, q_id, user_id):
         session = sessionmaker(bind=self.engine)()
         q = session.query(Queue).filter(Queue.id == q_id).first()
@@ -120,6 +122,7 @@ class QueueHandler(object):
                 session.delete(place)
                 session.commit()
                 session.close()
+                # refresh()
                 return True
             else:
                 session.close()

@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  bot:
+    build:
+      context: './bot/'
+      dockerfile: "./Dockerfile"
+    restart: always
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "queue"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    build:
+      context: './database'
+      dockerfile: "./Dockerfile"
+    ports:
+      - "5432:5432"

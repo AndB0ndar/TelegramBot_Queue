@@ -179,7 +179,8 @@ def decorate_connect(message):
     """decorator called when a command is given to connection the queue"""
     command = re.split(r' ', message.text, 1)
     if len(command) == 2:
-        fl, title = connect_by_name(command[1], message.from_user.id) if command[0] == "/connect" \
+        title = command[1]
+        fl = connect_by_name(command[1], message.from_user.id) if command[0] == "/connect" \
             else connect_by_id(command[1], message.from_user.id)
         if fl:
             answer = "Вы подключились к группе: " + title
@@ -248,5 +249,6 @@ def decorate_main(message):
 
 
 if __name__ == "__main__":
+    print("bot started")
     bot.polling(none_stop=True, interval=0)
 # bot.infinity_polling()
