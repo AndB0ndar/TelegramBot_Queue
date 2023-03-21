@@ -147,6 +147,10 @@ def info_by_id(q_id, user_id):
     q = QueueHandler()
     return q.info_by_id(q_id, user_id)
 
+def notification_by_name(q_name):
+    q = QueueHandler()
+    return q.get_first_two_by_name(q_name)
+
 
 @bot.message_handler(commands=['start'])
 def decorate_info(message):
@@ -217,6 +221,9 @@ def decorate_main(message):
             fl = disconnect_by_name(re.split(r'^Выйти из очереди ', message.text)[1], message.from_user.id)
         if fl:
             answer = "Вы вышли из очереди"
+            lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[1])
+            for user in lst:
+                bot.send_message(user, "ваша очередь")
         else:
             answer = "Что-то пошло не так, попробуйте повторить позже"
     elif len(re.split(r"^Встать в очередь ", message.text)) > 1:
@@ -225,8 +232,8 @@ def decorate_main(message):
             fl = connect_by_id(re.split(r'id', message.text)[1], message.from_user.id)
         else:
             fl = connect_by_name(re.split(r'^Встать в очередь ', message.text)[1], message.from_user.id)
-        if fl:
-            answer = "Вы добавлены в очередь"
+        if type(fl) is int:
+            answer = "Место " + str(fl)
         else:
             answer = "Что-то пошло не так, попробуйте повторить позже"
     elif len(re.split(r"^Информация об очереди ", message.text)) > 1:

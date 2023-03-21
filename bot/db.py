@@ -59,24 +59,31 @@ class QueueHandler(object):
     def get_last_place(self, session, q_id):
         lst = session.query(Place).filter(Place.queue_id == q_id).all()
         if lst:
-            return max([x.place for x in lst]+1)
+            return max([x.place for x in lst])+1
         else:
             return 0
+
+    def connect(self, q_id, user_id):
+        session = sessionmaker(bind=self.engine)()
+        check = session.query(Place).filter(Place.queue_id == q_id, Place.user_id == user_id).first()
+        if check is None:
+            num = self.get_last_place(session, q_id)
+            place = Place(queue_id=q_id, user_id=user_id, place=num)
+            session.add(place)
+            session.commit()
+            session.close()
+            return num
+        else:
+            session.close()
+            return False
 
     def connect_by_name(self, name, user_id):
         session = sessionmaker(bind=self.engine)()
         q = session.query(Queue).filter(Queue.name == name).first()
         if q is not None:
-            check = session.query(Place).filter(Place.queue_id==q.id,Place.user_id==user_id).first()
-            if check is None:
-                place = Place(queue_id=q.id, user_id=user_id, place=self.get_last_place(session, q.id))
-                session.add(place)
-                session.commit()
-                session.close()
-                return True
-            else:
-                session.close()
-                return False
+            conn = self.connect(q.id,user_id)
+            session.close()
+            return conn
         else:
             session.close()
             return False
@@ -85,16 +92,39 @@ class QueueHandler(object):
         session = sessionmaker(bind=self.engine)()
         q = session.query(Queue).filter(Queue.id == q_id).first()
         if q is not None:
-            place = Place(par_id=q.id, user_id=user_id, plase=self.get_last_place(session, q.id))
-            session.add(place)
-            session.commit()
+            conn = self.connect(q.id, user_id)
             session.close()
-            return True
+            return conn
         else:
             session.close()
             return False
 
-    # def refresh_queue(self, q_id):
+    def refresh_queue(self, q_id):
+        session = sessionmaker(bind=self.engine)()
+        lst = session.query(Place).filter(Place.queue_id == q_id, )
+        for x in lst:
+            x.place -= 1
+        session.commit()
+        session.close()
+
+    def get_first_two_by_name(self, q_name):
+        session = sessionmaker(bind=self.engine)()
+        q = session.query(Queue).filter(Queue.name == q_name).first()
+        if q is not None:
+            lst = session.query(Place).filter(Place.queue_id == q.id)
+            klc = 2
+            res = []
+            if lst:
+                lst = sorted(lst, key=lambda place: place.place)
+                for p in lst:
+                    if klc == 0:
+                        break
+                    res.append(p.user_id)
+                return res
+            else:
+                return False
+        return False
+
 
     def disconnect_by_id(self, q_id, user_id):
         session = sessionmaker(bind=self.engine)()
@@ -105,6 +135,7 @@ class QueueHandler(object):
                 session.delete(place)
                 session.commit()
                 session.close()
+                self.refresh_queue()
                 return True
             else:
                 session.close()
@@ -119,10 +150,11 @@ class QueueHandler(object):
         if q is not None:
             place = session.query(Place).filter(Place.queue_id == q.id, Place.user_id == user_id).first()
             if place is not None:
+                q_num = q.id
                 session.delete(place)
                 session.commit()
                 session.close()
-                # refresh()
+                self.refresh_queue(q_num)
                 return True
             else:
                 session.close()
