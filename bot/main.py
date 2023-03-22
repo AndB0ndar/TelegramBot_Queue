@@ -222,8 +222,9 @@ def decorate_main(message):
         if fl:
             answer = "Вы вышли из очереди"
             lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[0])
-            for user in lst:
-                bot.send_message(user, "ваша очередь")
+            if lst:
+                for user in lst:
+                    bot.send_message(user, "ваша очередь")
         else:
             answer = "Что-то пошло не так, попробуйте повторить позже"
     elif len(re.split(r"^Встать в очередь ", message.text)) > 1:
