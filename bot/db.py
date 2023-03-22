@@ -108,12 +108,12 @@ class QueueHandler(object):
         session.commit()
         session.close()
 
-    def get_first_two_by_name(self, q_name):
+    def get_first_by_name(self, q_name):
         session = sessionmaker(bind=self.engine)()
         q = session.query(Queue).filter(Queue.name == q_name).first()
         if q is not None:
             lst = session.query(Place).filter(Place.queue_id == q.id)
-            klc = 2
+            klc = 1
             res = []
             if lst:
                 lst = sorted(lst, key=lambda place: place.place)

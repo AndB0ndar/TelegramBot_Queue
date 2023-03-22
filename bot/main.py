@@ -149,7 +149,7 @@ def info_by_id(q_id, user_id):
 
 def notification_by_name(q_name):
     q = QueueHandler()
-    return q.get_first_two_by_name(q_name)
+    return q.get_first_by_name(q_name)
 
 
 @bot.message_handler(commands=['start'])
@@ -221,7 +221,7 @@ def decorate_main(message):
             fl = disconnect_by_name(re.split(r'^Выйти из очереди ', message.text)[1], message.from_user.id)
         if fl:
             answer = "Вы вышли из очереди"
-            lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[1])[0]
+            lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[1])
             if lst:
                 for user in lst:
                     bot.send_message(user, "ваша очередь")
