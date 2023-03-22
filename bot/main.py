@@ -221,7 +221,7 @@ def decorate_main(message):
             fl = disconnect_by_name(re.split(r'^Выйти из очереди ', message.text)[1], message.from_user.id)
         if fl:
             answer = "Вы вышли из очереди"
-            lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[0])
+            lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[1])[0]
             if lst:
                 for user in lst:
                     bot.send_message(user, "ваша очередь")
