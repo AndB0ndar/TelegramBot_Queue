@@ -99,11 +99,12 @@ class QueueHandler(object):
             session.close()
             return False
 
-    def refresh_queue(self, q_id):
+    def refresh_queue(self, q_id, num):
         session = sessionmaker(bind=self.engine)()
         lst = session.query(Place).filter(Place.queue_id == q_id, )
         for x in lst:
-            x.place -= 1
+            if x.palse > num:
+                x.place -= 1
         session.commit()
         session.close()
 
@@ -120,6 +121,7 @@ class QueueHandler(object):
                     if klc == 0:
                         break
                     res.append(p.user_id)
+                    klc -= 1
                 return res
             else:
                 return False
@@ -132,10 +134,12 @@ class QueueHandler(object):
         if q is not None:
             place = session.query(Place).filter(Place.queue_id == q_id, Place.user_id == user_id).first()
             if place is not None:
+                q_num = q.id
+                num = place.place
                 session.delete(place)
                 session.commit()
                 session.close()
-                self.refresh_queue()
+                self.refresh_queue(q_num, num)
                 return True
             else:
                 session.close()
@@ -151,10 +155,11 @@ class QueueHandler(object):
             place = session.query(Place).filter(Place.queue_id == q.id, Place.user_id == user_id).first()
             if place is not None:
                 q_num = q.id
+                num = place.place
                 session.delete(place)
                 session.commit()
                 session.close()
-                self.refresh_queue(q_num)
+                self.refresh_queue(q_num, num)
                 return True
             else:
                 session.close()

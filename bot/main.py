@@ -160,8 +160,8 @@ def decorate_info(message):
     answer += "\nВведите:\n"
     answer += "/create <название очереди> - чтобы создать очередь\n"
     answer += "/connect <название очереди> - чтобы вступить в очередь\n"
-    answer += "/connect_by_key <ключ очереди> - чтобы вступить в очередь\n"
-    answer += "\n/disconnect - чтобы отключиться от очередь"
+    # answer += "/connect_by_key <ключ очереди> - чтобы вступить в очередь\n"
+    # answer += "\n/disconnect - чтобы отключиться от очередь"
     bot.send_message(message.from_user.id, answer)
 
 
@@ -221,7 +221,7 @@ def decorate_main(message):
             fl = disconnect_by_name(re.split(r'^Выйти из очереди ', message.text)[1], message.from_user.id)
         if fl:
             answer = "Вы вышли из очереди"
-            lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[1])
+            lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[0])
             for user in lst:
                 bot.send_message(user, "ваша очередь")
         else:
