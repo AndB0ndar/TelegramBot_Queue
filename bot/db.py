@@ -103,7 +103,7 @@ class QueueHandler(object):
         session = sessionmaker(bind=self.engine)()
         lst = session.query(Place).filter(Place.queue_id == q_id, )
         for x in lst:
-            if x.palse > num:
+            if x.place > num:
                 x.place -= 1
         session.commit()
         session.close()
