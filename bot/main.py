@@ -1,7 +1,6 @@
 from telebot import TeleBot
 from telebot import types
 import re
-from random import randint
 from db import QueueHandler
 
 
@@ -24,17 +23,6 @@ def button_greed(title):
     msg_info = "Информация об очереди " + title
     markup.add(types.KeyboardButton(msg_info))
     return markup
-
-
-def generating_title():
-    """
-    A function to generate the name of the queue if it has not been entered by the user
-    Options:
-        None
-    Return value:
-        (str): generated name
-    """
-    return "queue_" + str(randint(10 ** 5, 10 ** 10))
 
 
 def create(title):
@@ -102,26 +90,6 @@ def disconnect_by_name(queue_title, user_id):
     return q.disconnect_by_name(queue_title, user_id)
 
 
-def quite():
-    """
-    Dequeue function
-    Options:
-    Return value:
-        (bool): success/failure of dequeuing
-    """
-    return True
-
-
-def add():
-    """
-    Add to queue function
-    Options:
-    Return value:
-        (bool): success/failure of adding to the queue
-    """
-    return True
-
-
 def info_by_name(q_title, user_id):
     """
     A function giving information about the queue
@@ -172,7 +140,7 @@ def decorate_create(message):
     title = command[1] if len(command) == 2 else generating_title()
     res = create(title)
     if res is False:
-        answer = "Имя занято"
+        answer = "Имя занято 🙉"
     else:
         answer = "Ключ вашей очереди: " + str(res)
     bot.send_message(message.from_user.id, answer)
@@ -187,7 +155,7 @@ def decorate_connect(message):
         fl = connect_by_name(command[1], message.from_user.id) if command[0] == "/connect" \
             else connect_by_id(command[1], message.from_user.id)
         if fl:
-            answer = "Вы подключились к группе: " + title
+            answer = "🚀 Вы подключились к группе: " + title
         else:
             answer = "Что-то пошло не так, попробуйте повторить позже"
         bot.send_message(message.from_user.id, answer, reply_markup=button_greed(title))
@@ -196,17 +164,6 @@ def decorate_connect(message):
         answer += "имя" if command[0] == "/connect" else "ключ"
         answer += " очереди"
         bot.send_message(message.from_user.id, answer)
-
-
-# @bot.message_handler(commands=['disconnect'])
-# def decorate_disconnect(message):
-#     """the decorator called when a command is given to disconnect from the queue"""
-#     fl = disconnect()
-#     if fl:
-#         answer = "Вы отключились от очереди"
-#     else:
-#         answer = "Что-то пошло не так, попробуйте повторить позже"
-#     bot.send_message(message.from_user.id, answer, reply_markup=markup)
 
 
 @bot.message_handler(content_types=['text'])
@@ -220,7 +177,7 @@ def decorate_main(message):
         else:
             fl = disconnect_by_name(re.split(r'^Выйти из очереди ', message.text)[1], message.from_user.id)
         if fl:
-            answer = "Вы вышли из очереди"
+            answer = "🚪Вы вышли из очереди"
             lst = notification_by_name(re.split(r'^Выйти из очереди ', message.text)[1])
             if lst:
                 for user in lst:
@@ -234,7 +191,7 @@ def decorate_main(message):
         else:
             fl = connect_by_name(re.split(r'^Встать в очередь ', message.text)[1], message.from_user.id)
         if type(fl) is int:
-            answer = "Место " + str(fl)
+            answer = "🚩Место " + str(fl)
         else:
             answer = "Что-то пошло не так, попробуйте повторить позже"
     elif len(re.split(r"^Информация об очереди ", message.text)) > 1:
@@ -246,7 +203,7 @@ def decorate_main(message):
         if type(fl) is int:
             answer = "Место " + str(fl)
         else:
-            answer = "Вы не в очереди"
+            answer = "🚫 Вы не в очереди"
     else:
         bot.reply_to(message, "Я не занаю такой команды!")
         answer = "Попробуй ещё раз"
