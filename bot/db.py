@@ -38,7 +38,7 @@ class QueueHandler(object):
 
     def __init__(self):
         self.meta = MetaData()
-        self.engine = create_engine('postgresql+psycopg2://postgres:postgres@postgres:60101/queue')
+        self.engine = create_engine('postgresql+psycopg2://postgres:postgres@postgres:5432/queue')
         # self.engine = create_engine('postgresql+psycopg2://postgres:postgres@localhost:5433/Queue')
         Base.metadata.create_all(self.engine)
     def create_queue(self, name):
